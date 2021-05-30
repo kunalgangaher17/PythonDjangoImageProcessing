@@ -1,0 +1,452 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Thinking Machines - ImageProcessor</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" type='text/css' href="{% static 'bootstrap-4/css/bootstrap.min.css' %}">
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- Font Awesome JS -->
+    <script defer src="{% static 'fontawesome/solid.js' %}"></script>
+    <script defer src="{% static 'fontawesome/fontawesome.js' %}"></script>
+
+    <script>
+        function ViewState() {
+            this.state = 'none'; // other states -> open | openingthis.fileName='';
+            this.name = '';
+            this.email = '';
+        }
+        var viewState = new ViewState();
+        var openFileDivision = null;
+        var clientArea = null;
+        function initializeState() {
+            $.ajax({
+                url: "getState",
+                type: "GET",
+                cache: false,
+                success: function (res) {
+                    viewState = res;
+                    updateView();
+                }
+            });
+        }
+        function updateView() {
+            if (clientArea == null) clientArea = $('#clientArea');
+            if (openFileDivision == null) openFileDivision = $('#openFileDivision');
+            if (viewState.state == 'none') {
+                $('#sidebar').css('visibility', 'hidden');
+                $('#sidebarCollapse').css('visibility', 'hidden'); $('#sidebar').hide();
+                $('#sidebarCollapse').hide();
+                $('#sidebar').css('display', 'none');
+                $('#sidebarCollapse').css('display', 'none');
+                clientArea.html(openFileDivision);
+                $('#fileOptions').css('visibility', 'hidden');
+                $('#topBar').css('visibility', 'hidden');
+            }
+            if (viewState.state == 'opening') {
+                $('#clientArea').html('<i class="fa fa-spinner fa-spin centered" style="font-size:24px"></i>');
+            }
+            if (viewState.state == 'open') {
+                $('#sidebar').css('visibility', 'visible');
+                $('#sidebarCollapse').css('visibility', 'visible');
+                $('#sidebar').css('display', '');
+                $('#sidebarCollapse').css('display', '');
+                $('#sidebar').show();
+                $('#sidebarCollapse').show();
+                $('#fileOptions').css('visibility', 'visible');
+                $('#topBar').css('visibility', 'visible');
+                $('#clientArea').html("<img class='imageEditor' src='/iprocone/getImage?&xcsdf=" + encodeURI(new Date())
+                    + "'>");
+            }
+        }
+        function closeFile() {
+            viewState.state = 'none';
+            updateView();
+            $.ajax({
+                url: "closeFile",
+                type: "GET",
+                cache: false,
+                success: function (res) {
+                    // do nothing 
+                }
+            });
+        }
+        function openFile() {
+            var openFileForm = document.getElementById('openFileForm');
+            var formData = new FormData(openFileForm);
+            viewState.state = 'opening';
+            updateView();
+            $('#spinnerWrap').css('display', '');
+            $('#spinnerWrap').css('visibility', 'visible');
+            $('#spinnerWrap').show();
+            $.ajax({
+                url: "openFile",
+                type: "POST",
+                data: formData,
+                enctype: 'multipart/form-data',
+                processData: false, contentType: false,
+                cache: false,
+                success: function (res) {
+                    viewState.state = 'open';
+                    viewState.fileName = res.fileName;
+                    viewState.email = res.email;
+                    viewState.name = res.name;
+                    openFileForm.reset();
+                    updateView();
+                    $('#spinnerWrap').css('display', 'none');
+                    $('#spinnerWrap').css('visibility', 'hidden');
+                    $('#spinnerWrap').hide();
+                    $('#imageFileName').html('Image : ' + viewState.fileName);
+                }
+            });
+        }
+        function toGrayscale() {
+            $('#spinnerWrap').css('display', '');
+            $('#spinnerWrap').css('visibility', 'visible');
+            $('#spinnerWrap').show();
+            $.ajax({
+                url: "toGrayscale",
+                type: "GET",
+                cache: false,
+                success: function (res) {
+                    updateView(); $('#spinnerWrap').css('display', 'none');
+                    $('#spinnerWrap').css('visibility', 'hidden');
+                    $('#spinnerWrap').hide();
+                }
+            });
+        }
+
+        function rotateImage() {
+            var rotateForm = document.getElementById('rotateItForm');
+            var rotateItFormData = new FormData(rotateForm);
+            $.ajax({
+                url: "rotateIt",
+                type: "POST",
+                data: rotateItFormData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                success: function (res) {
+                    updateView();
+                }
+            });
+
+        }
+        function scaleIt() {
+            var scaleForm = document.getElementById('scaleItForm');
+            var scaleItFormData = new FormData(scaleForm);
+            $.ajax({
+                url: "scaleIt",
+                type: "POST",
+                data: scaleItFormData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                success: function (res) {
+                    updateView();
+                }
+            });
+        }
+
+        function setborder() {
+            var borderForm = document.getElementById('setborder')
+            var formData = new FormData(borderForm)
+
+            $.ajax({
+                url: "setBorder",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                success: function (response) {
+                    updateView()
+                }
+            });
+        }
+
+
+    </script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Sidebar Holder -->
+        <nav id="sidebar" style='visibility:hidden;display:none'>
+            <div class="sidebar-header">
+                <h3>iMagic</h3>
+            </div>
+            <ul class="list-unstyled components" id='imageProcessingOptions'>
+                <p>Image Processing</p>
+                <li>
+                    <a href="javascript:toGrayscale()">To Grayscale</a>
+                </li>
+                <li>
+                    <a href="javascript:$('#scaleItModal').modal('show')">Scale It</a>
+                </li>
+                <li>
+                    <a href="javascript:$('#rotateModal').modal('show')">Rotate</a>
+                </li>
+                <li>
+                    <a href="javascript:$('#borderModal').modal('show')">Set Border</a>
+                </li>
+                <li><a href='#'>Many more .........</a>></li>
+            </ul>
+        </nav>
+        <!-- Page Content Holder -->
+        <div id="content">
+            <nav id='navigationBar' class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="navbar-btn"
+                        style='visibility:hidden;display:none'>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <span class='nav-company'>Thinking Machines</span>
+                    <span id='fileOptions' style='visibility:hidden'>
+                        <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button"
+                            data-toggle="collapse" data-target="#navbarSupportedContent"
+                            aria-controls="navbarSupportedContent" aria-expanded="false" arialabel="Toggle navigation">
+                            <i class="fas fa-align-justify"></i>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="nav navbar-nav ml-auto">
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="javascript:closeFile()">Close file</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </span>
+                </div>
+            </nav>
+            <div id='topBar' class='topBar' style='visibility:hidden'>
+                <span class='imageFileName' id='imageFileName'></span>
+                <a href="downloadFile">Download Files</a>
+                <span class='currentDate'>{{ today }}</span>
+            </div>
+            <div id='clientArea'>
+                <div id='openFileDivision'>
+                    <h3>Open file and let the magic begin</h3>
+                    <form id='openFileForm' enctype="multipart/form-data">
+                        <div class='form-group'>
+                            {% csrf_token %}
+                            <label for='email'>Email Id.</label>
+                            <input class='form-control' type='text' id='email' name='email'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='name'>Name</label>
+                            <input class='form-control' type='text' id='name' name='name'>
+                        </div>
+                        <div class='form-group'>
+                            <input class='form-control' type='file' id='fileName' name='fileName' accept='image/*'>
+                        </div>
+                        <button type='button' onclick='openFile()' class='btn btn-primary'>Open file</button>
+                    </form>
+                </div> <!-- open file div end -->
+            </div> <!-- client area ends -->
+            <div class="line"></div>
+            <footer class="page-footer">
+                <!-- Copyright -->
+                <div class=" text-center">© 2018 Copyright:
+                    <a href="http://thinkingmachines.in/"> Thinking Machines</a>
+                </div>
+                <!-- Copyright -->
+            </footer>
+        </div>
+    </div>
+    <div id="spinnerWrap" style='visibility:hidden;display:none'>
+        <div class="spinnerIcon">
+            Loading<br />
+            <i class="fa fa-spinner fa-spin" style="font-size:48px"></i>
+        </div>
+    </div>
+
+    <!-- Scale it modal started -->
+    <div class="modal fade" id="scaleItModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Scale It</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id='scaleItForm' class='form-horizontal'>
+                        <div class='form-group'>
+                            {% csrf_token %}
+                            <label for='width'>Width %</label>
+                            <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
+                                id='height' name='newWidth'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='height'>Height %</label>
+                            <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
+                                id='height' name='newHeight'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='maintainAspectRation'>Maintain Aspect Ratio</label>
+                            <input class='form-control' type='checkbox' checked id='maintainAspectRatio'
+                                name='maintainAspectRation'>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="javascript:scaleIt()"
+                        data-dismiss="modal">Scale it</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scale it modal end -->
+
+    <!-- Rotate modal started -->
+    <div class="modal fade" id="rotateModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Rotate It</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id='rotateItForm' class='form-horizontal'>
+                        <div class="slidecontainer">
+                            <label for='maintainAspectRation'>Maintain Aspect Ratio</label>
+                            <input type="range" min="1" max="360" value="50" class="slider" id="angleRange"
+                                name="angleRange" , style="width: 100%">
+                            <p>Angle Value: <span id="angleValue" name="angleValue"></span></p>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="javascript:rotateImage()"
+                        data-dismiss="modal">Rotate it</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Rotate modal end -->
+
+
+    <!-- Border modal started -->
+    <div class="modal fade" id="borderModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Set Border</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id='setborder' class='form-horizontal'>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio" name="borderType" value="color">
+                            <label class="custom-control-label" for="customRadio">Color</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio2" name="borderType" value="reflect">
+                            <label class="custom-control-label" for="customRadio2">Reflect</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio3" name="borderType" value="replicate">
+                            <label class="custom-control-label" for="customRadio3">Replicate</label>
+                          </div>
+
+                        <div class='form-group'>
+                            {% csrf_token %}
+                            <label for='width'>Top Border size</label>
+                            <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
+                                id='height' name='topBorderSize'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='width'>Bottom border size</label>
+                            <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
+                                id='height' name='bottomBorderSize'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='width'>Left Border size</label>
+                            <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
+                                id='height' name='leftBorderSize'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='width'>Right Border size</label>
+                            <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
+                                id='height' name='rightBorderSize'>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="javascript:setborder()"
+                        data-dismiss="modal">Set</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Border modal end -->
+
+
+
+    <!-- jQuery CDN - Slim version (=without AJAX) -->
+    <script src="{% static 'jquery-3.3.1/jquery.min.js' %}"></script>
+    <!-- Popper.JS -->
+    <script src="{% static 'popper/popper.min.js' %}"></script>
+    <!-- Bootstrap JS -->
+    <script src="{% static 'bootstrap-4/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+                $(this).toggleClass('active');
+            });
+        });
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
+        window.addEventListener('load', initializeState);
+        var slider = document.getElementById("angleRange");
+        var output = document.getElementById("angleValue");
+        output.innerHTML = slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function () {
+            output.innerHTML = slider.value;
+        }
+    </script>
+</body>
+
+</html>

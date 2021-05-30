@@ -1,0 +1,276 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+body {
+ font-family: 'Poppins', sans-serif;
+ background: #fafafa;
+}
+p {
+ font-family: 'Poppins', sans-serif;
+ font-size: 1.1em;
+ font-weight: 300;
+ line-height: 1.7em;
+ color: #999;
+}
+a, a:hover, a:focus {
+ color: inherit; text-decoration: none;
+ transition: all 0.3s;
+}
+.navbar {
+ padding: 15px 10px;
+ background: #fff;
+ border: none;
+ border-radius: 0;
+ margin-bottom: 40px;
+ box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+.navbar-btn {
+ box-shadow: none;
+ outline: none !important;
+ border: none;
+}
+.line {
+ width: 100%;
+ height: 1px;
+ border-bottom: 1px dashed #ddd;
+ margin: 40px 0;
+}
+/* --------------------------------------------------- * SIDEBAR STYLE
+ * ----------------------------------------------------- */
+.wrapper {
+ display: flex;
+ width: 100%;
+ align-items: stretch;
+ perspective: 1500px;
+}
+#sidebar {
+ min-width: 250px;
+ max-width: 250px;
+ background: #000;
+ color: #fff;
+ transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+ transform-origin: bottom left;
+}
+#sidebar.active {
+ margin-left: -250px;
+ transform: rotateY(100deg);
+}
+#sidebar .sidebar-header {
+ padding: 20px; background: #003366;
+}
+#sidebar ul.components {
+ padding: 20px 0;
+ border-bottom: 1px solid #fff;
+}
+#sidebar ul p {
+ color: #fff;
+ padding: 10px;
+}
+#sidebar ul li a {
+ padding: 10px;
+ font-size: 1.1em;
+ display: block;
+}
+#sidebar ul li a:hover {
+ color: #7386D5;
+ background: #fff;
+}
+#sidebar ul li.active > a, a[aria-expanded="true"] {
+ color: #000;
+ background: #97CBFF;
+}a[data-toggle="collapse"] {
+ position: relative;
+}
+.dropdown-toggle::after {
+ display: block;
+ position: absolute;
+ top: 50%;
+ right: 20px;
+ transform: translateY(-50%);
+}
+ul ul a {
+ font-size: 0.9em !important;
+ padding-left: 30px !important;
+ background: #6d7fcc;
+}
+ul.CTAs {
+ padding: 20px;
+}
+ul.CTAs a {
+ text-align: center;
+ font-size: 0.9em !important; display: block;
+ border-radius: 5px;
+ margin-bottom: 5px;
+}
+a.download {
+ background: #fff;
+ color: #7386D5;
+}
+a.article, a.article:hover {
+ background: #6d7fcc !important;
+ color: #fff !important;
+}
+/* ---------------------------------------------------
+ * CONTENT STYLE
+ * ----------------------------------------------------- */
+#content {
+ width: 100%;
+ padding: 20px;
+ min-height: 100vh;
+ transition: all 0.3s;
+}#sidebarCollapse {
+ width: 40px;
+ height: 40px;
+ background: #f5f5f5;
+ cursor: pointer;
+}
+#sidebarCollapse span {
+ width: 80%;
+ height: 2px;
+ margin: 0 auto;
+ display: block;
+ background: #555;
+ transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
+ transition-delay: 0.2s;
+}
+#sidebarCollapse span:first-of-type {
+ transform: rotate(45deg) translate(2px, 2px);
+}
+#sidebarCollapse span:nth-of-type(2) {
+ opacity: 0;
+}
+#sidebarCollapse span:last-of-type {
+ transform: rotate(-45deg) translate(1px, -1px);
+}#sidebarCollapse.active span {
+ transform: none;
+ opacity: 1;
+ margin: 5px auto;
+}
+/* ---------------------------------------------------
+ * MEDIAQUERIES
+ * ----------------------------------------------------- */
+@media (max-width: 768px) {
+ #sidebar {
+ margin-left: -250px;
+ transform: rotateY(90deg);
+ }
+ #sidebar.active {
+ margin-left: 0;
+ transform: none;
+ }
+ #sidebarCollapse span:first-of-type,
+ #sidebarCollapse span:nth-of-type(2),
+ #sidebarCollapse span:last-of-type {
+ transform: none;
+ opacity: 1;
+ margin: 5px auto;
+ } #sidebarCollapse.active span {
+ margin: 0 auto;
+ }
+ #sidebarCollapse.active span:first-of-type {
+ transform: rotate(45deg) translate(2px, 2px);
+ }
+ #sidebarCollapse.active span:nth-of-type(2) {
+ opacity: 0;
+ }
+ #sidebarCollapse.active span:last-of-type {
+ transform: rotate(-45deg) translate(1px, -1px);
+ }
+}
+.centered {
+ position: fixed;
+ z-index: 999;
+ height: 2em;
+ width: 2em;
+ overflow: show;
+ margin: auto;
+ top: 0;
+ left: 0;
+ bottom: 0;
+ right: 0;
+}.imageEditor {
+ margin: auto;
+ top: 0;
+ left: 0;
+ bottom: 0;
+ right: 0;
+ padding: 20px;
+ border: 2px solid gray;
+ max-height:800px;
+ max-width:800px;
+}
+.currentDate {
+float:right;
+padding-top:5px;
+padding-right:5px;
+font-size: 16pt;
+}
+.topBar{
+height:40px;
+background: #43464B;
+color: white;
+margin-bottom:10px;
+}
+.nav-company{
+font-size:20pt;position: fixed;
+margin-left:40px;
+}
+.page-footer{
+color: #003336;
+}
+#spinnerWrap {
+ position: fixed;
+ width: 100%;
+ height:100%;
+ display: flex;
+ background: rgba(0, 0, 0, 0.91);
+ top: 0;
+}
+.spinnerIcon {
+ margin: auto;
+ color: #fff;
+ text-align: center;
+ font-size:40pt;
+}
+.imageFileName {
+float: left;
+padding-top:5px;padding-left:5px;
+font-size: 16pt;
+}
+
+.slidecontainer {
+    width: 100%; /* Width of the outside container */
+  }
+  
+  /* The slider itself */
+  .slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
+  
+  /* Mouse-over effects */
+  .slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+  }
+  
+  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
