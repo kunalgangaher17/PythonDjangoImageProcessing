@@ -161,6 +161,7 @@ def setBorder(request):
         rightBorderSize = int(request.POST['rightBorderSize'])
         leftBorderSize = int(request.POST['leftBorderSize'])
         borderType = request.POST['borderType']
+        borderColor=request.POST['borderColor']
         border=cv.BORDER_CONSTANT
 
         if borderType=='color':
@@ -193,6 +194,67 @@ def setBorder(request):
     else:
         return HttpResponse('')
 
+def enhanceImage(request):
+    print("enhance image called")
+    if request.method == 'POST' and request.session.has_key('stack'):
+        brightnessValue=int(request.POST['brightnessInput'])
+        contrastValue=int(request.POST['contrastInput'])
+        #print("Brightness :"+brightnessValue+"Contrast value :"+contrastValue)
+        stack = request.session['stack']
+        fileAbsolutePath = stack[0]
+        enahnceImagefilePath = str(Path(fileAbsolutePath).with_suffix(
+            ''))+str(uuid.uuid4())+'.png'
+        enhanceImage = cv.imread(fileAbsolutePath)
+
+        enhancedImage=controller(enhanceImage,brightnessValue,contrastValue)
+        cv.imwrite(enahnceImagefilePath, enhancedImage)
+        enhancedImageFileName = enahnceImagefilePath.split('/')[-1]
+        stack.insert(0, enhancedImageFileName)
+        request.session['stack'] = stack
+        return JsonResponse({'response': 'Croped'})
+    else:
+        return HttpResponse('')
+
+
+
+
+    return HttpResponse('')
+
+def controller(img, brightness=255, contrast=127):
+    brightness = int((brightness - 0) * (255 - (-255)) / (510 - 0) + (-255))
+  
+    contrast = int((contrast - 0) * (127 - (-127)) / (254 - 0) + (-127))
+  
+    if brightness != 0:
+        if brightness > 0:
+            shadow = brightness
+            max = 255
+        else:
+            shadow = 0
+            max = 255 + brightness
+        al_pha = (max - shadow) / 255
+        ga_mma = shadow
+        # The function addWeighted 
+        # calculates the weighted sum 
+        # of two arrays
+        cal = cv.addWeighted(img, al_pha,
+                              img, 0, ga_mma)
+    else:
+        cal = img
+    if contrast != 0:
+        Alpha = float(131 * (contrast + 127)) / (127 * (131 - contrast))
+        Gamma = 127 * (1 - Alpha)
+        # The function addWeighted calculates
+        # the weighted sum of two arrays
+        cal = cv.addWeighted(cal, Alpha,
+                              cal, 0, Gamma)
+    # putText renders the specified
+    # text string in the image.
+    cv.putText(cal, ''.format(brightness, 
+                                        contrast), 
+                (10, 30), cv.FONT_HERSHEY_SIMPLEX, 
+                1, (0, 0, 255), 2)
+    return cal
 
 def downloadFile(request):
     fileResponse = open(

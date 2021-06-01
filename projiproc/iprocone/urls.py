@@ -10,4 +10,5 @@ path('scaleIt',views.scaleIt,name='scaleIt'),
 path('rotateIt',views.rotateIt,name='rotateIt'),
 path('setBorder',views.setBorder,name='setBorder'),
 path('downloadFile',views.downloadFile,name='downloadFile'),
+path('enhanceImage',views.enhanceImage, name="enhanceImage"),
 ]

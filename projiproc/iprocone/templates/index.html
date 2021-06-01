@@ -170,6 +170,34 @@
             });
         }
 
+        function enhanceImage() {
+            var enhanceImageForm=document.getElementById('enhanceImage');
+            var formData=new FormData(enhanceImageForm)
+
+            $.ajax({
+                url:"enhanceImage",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                success: function(response) {
+                    updateView()
+                }
+            })
+
+        }
+
+        function hideColorField()
+        {
+            document.getElementById("borderColor").style.visibility='hidden';
+        }
+
+        function showColorField()
+        {
+            document.getElementById("borderColor").style.visibility='visible';
+        }
+
 
     </script>
 </head>
@@ -194,6 +222,9 @@
                 </li>
                 <li>
                     <a href="javascript:$('#borderModal').modal('show')">Set Border</a>
+                </li>
+                <li>
+                    <a href="javascript:$('#enhanceImageModal').modal('show')">Enhance Image</a>
                 </li>
                 <li><a href='#'>Many more .........</a>></li>
             </ul>
@@ -353,15 +384,15 @@
                 <div class="modal-body">
                     <form id='setborder' class='form-horizontal'>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio" name="borderType" value="color">
+                            <input type="radio" class="custom-control-input" id="customRadio" name="borderType" value="color" onclick="javascript:showColorField()">
                             <label class="custom-control-label" for="customRadio">Color</label>
                           </div>
                           <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio2" name="borderType" value="reflect">
+                            <input type="radio" class="custom-control-input" id="customRadio2" name="borderType" value="reflect" onclick="javascript:hideColorField()">
                             <label class="custom-control-label" for="customRadio2">Reflect</label>
                           </div>
                           <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio3" name="borderType" value="replicate">
+                            <input type="radio" class="custom-control-input" id="customRadio3" name="borderType" value="replicate" onclick="javascript:hideColorField()">
                             <label class="custom-control-label" for="customRadio3">Replicate</label>
                           </div>
 
@@ -386,6 +417,10 @@
                             <input class='form-control' type='number' min='-10' max='200' step='1' value='100'
                                 id='height' name='rightBorderSize'>
                         </div>
+                        <div class='form-group'>
+                            <label for='width'>Select Color</label>
+                            <input class='form-control' type='color' id='borderColor' name='borderColor' style="visibility:visible">
+                        </div>
                     </form>
                 </div>
                 <!-- Modal footer -->
@@ -400,6 +435,44 @@
     <!-- Border modal end -->
 
 
+    <!--Enhance Image Modal Started-->
+    <div class="modal fade" id="enhanceImageModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Enhance It</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id='enhanceImage' class='form-horizontal'>
+                        <div class="slidecontainer">
+                            <label for='maintainAspectRation'>Maintain Brightness Ratio</label>
+                            <input type="range" min="1" max="510" value="255" class="slider" id="brightnessInput"
+                                name="brightnessInput" , style="width: 100%">
+                            <p>Brightness: <span id="brightnessValue" name="brightnessValue"></span></p>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <label for='maintainAspectRation'>Maintain Contrast Ratio</label>
+                            <input type="range" min="1" max="510" value="255" class="slider" id="contrastInput"
+                                name="contrastInput" , style="width: 100%">
+                            <p>Contrast: <span id="contrastValue" name="contrastValue"></span></p>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="javascript:enhanceImage()"
+                        data-dismiss="modal">Enhance</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Enhance Image Modal end-->
 
     <!-- jQuery CDN - Slim version (=without AJAX) -->
     <script src="{% static 'jquery-3.3.1/jquery.min.js' %}"></script>
@@ -446,6 +519,21 @@
         slider.oninput = function () {
             output.innerHTML = slider.value;
         }
+
+        var brightnessInput=document.getElementById("brightnessInput");
+        var brightnessValue=document.getElementById("brightnessValue");
+
+        brightnessInput.oninput = function() {
+            brightnessValue.innerHTML=brightnessInput.value;
+        }
+
+        var contrastInput=document.getElementById("contrastInput");
+        var contrastValue=document.getElementById("contrastValue");
+
+        contrastInput.oninput = function() {
+            contrastValue.innerHTML=contrastInput.value;
+        }
+
     </script>
 </body>
 
