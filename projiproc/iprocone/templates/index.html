@@ -14,6 +14,7 @@
     <!-- Font Awesome JS -->
     <script defer src="{% static 'fontawesome/solid.js' %}"></script>
     <script defer src="{% static 'fontawesome/fontawesome.js' %}"></script>
+    <script defer src="{% static 'bootstrap-4/js/bootstrap.min.js' %}"></script>
 
     <script>
         function ViewState() {
@@ -35,171 +36,19 @@
                 }
             });
         }
-        function updateView() {
-            if (clientArea == null) clientArea = $('#clientArea');
-            if (openFileDivision == null) openFileDivision = $('#openFileDivision');
-            if (viewState.state == 'none') {
-                $('#sidebar').css('visibility', 'hidden');
-                $('#sidebarCollapse').css('visibility', 'hidden'); $('#sidebar').hide();
-                $('#sidebarCollapse').hide();
-                $('#sidebar').css('display', 'none');
-                $('#sidebarCollapse').css('display', 'none');
-                clientArea.html(openFileDivision);
-                $('#fileOptions').css('visibility', 'hidden');
-                $('#topBar').css('visibility', 'hidden');
-            }
-            if (viewState.state == 'opening') {
-                $('#clientArea').html('<i class="fa fa-spinner fa-spin centered" style="font-size:24px"></i>');
-            }
-            if (viewState.state == 'open') {
-                $('#sidebar').css('visibility', 'visible');
-                $('#sidebarCollapse').css('visibility', 'visible');
-                $('#sidebar').css('display', '');
-                $('#sidebarCollapse').css('display', '');
-                $('#sidebar').show();
-                $('#sidebarCollapse').show();
-                $('#fileOptions').css('visibility', 'visible');
-                $('#topBar').css('visibility', 'visible');
-                $('#clientArea').html("<img class='imageEditor' src='/iprocone/getImage?&xcsdf=" + encodeURI(new Date())
-                    + "'>");
-            }
-        }
-        function closeFile() {
-            viewState.state = 'none';
-            updateView();
-            $.ajax({
-                url: "closeFile",
-                type: "GET",
-                cache: false,
-                success: function (res) {
-                    // do nothing 
-                }
-            });
-        }
-        function openFile() {
-            var openFileForm = document.getElementById('openFileForm');
-            var formData = new FormData(openFileForm);
-            viewState.state = 'opening';
-            updateView();
-            $('#spinnerWrap').css('display', '');
-            $('#spinnerWrap').css('visibility', 'visible');
-            $('#spinnerWrap').show();
-            $.ajax({
-                url: "openFile",
-                type: "POST",
-                data: formData,
-                enctype: 'multipart/form-data',
-                processData: false, contentType: false,
-                cache: false,
-                success: function (res) {
-                    viewState.state = 'open';
-                    viewState.fileName = res.fileName;
-                    viewState.email = res.email;
-                    viewState.name = res.name;
-                    openFileForm.reset();
-                    updateView();
-                    $('#spinnerWrap').css('display', 'none');
-                    $('#spinnerWrap').css('visibility', 'hidden');
-                    $('#spinnerWrap').hide();
-                    $('#imageFileName').html('Image : ' + viewState.fileName);
-                }
-            });
-        }
-        function toGrayscale() {
-            $('#spinnerWrap').css('display', '');
-            $('#spinnerWrap').css('visibility', 'visible');
-            $('#spinnerWrap').show();
-            $.ajax({
-                url: "toGrayscale",
-                type: "GET",
-                cache: false,
-                success: function (res) {
-                    updateView(); $('#spinnerWrap').css('display', 'none');
-                    $('#spinnerWrap').css('visibility', 'hidden');
-                    $('#spinnerWrap').hide();
-                }
-            });
+        function hideColorField() {
+            document.getElementById("borderColor").style.visibility = 'hidden';
         }
 
-        function rotateImage() {
-            var rotateForm = document.getElementById('rotateItForm');
-            var rotateItFormData = new FormData(rotateForm);
-            $.ajax({
-                url: "rotateIt",
-                type: "POST",
-                data: rotateItFormData,
-                processData: false,
-                contentType: false,
-                cache: false,
-                success: function (res) {
-                    updateView();
-                }
-            });
-
-        }
-        function scaleIt() {
-            var scaleForm = document.getElementById('scaleItForm');
-            var scaleItFormData = new FormData(scaleForm);
-            $.ajax({
-                url: "scaleIt",
-                type: "POST",
-                data: scaleItFormData,
-                processData: false,
-                contentType: false,
-                cache: false,
-                success: function (res) {
-                    updateView();
-                }
-            });
-        }
-
-        function setborder() {
-            var borderForm = document.getElementById('setborder')
-            var formData = new FormData(borderForm)
-
-            $.ajax({
-                url: "setBorder",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                cache: false,
-                success: function (response) {
-                    updateView()
-                }
-            });
-        }
-
-        function enhanceImage() {
-            var enhanceImageForm=document.getElementById('enhanceImage');
-            var formData=new FormData(enhanceImageForm)
-
-            $.ajax({
-                url:"enhanceImage",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                cache: false,
-                success: function(response) {
-                    updateView()
-                }
-            })
-
-        }
-
-        function hideColorField()
-        {
-            document.getElementById("borderColor").style.visibility='hidden';
-        }
-
-        function showColorField()
-        {
-            document.getElementById("borderColor").style.visibility='visible';
+        function showColorField() {
+            document.getElementById("borderColor").style.visibility = 'visible';
         }
 
 
     </script>
+
+    <script defer src="{% static 'js/index.js' %}"></script>
+
 </head>
 
 <body>
@@ -225,6 +74,12 @@
                 </li>
                 <li>
                     <a href="javascript:$('#enhanceImageModal').modal('show')">Enhance Image</a>
+                </li>
+                <li>
+                    <a href="javascript:flipHorizontal('flipImageHorizontally')">Flip Horizontal</a>
+                </li>
+                <li>
+                    <a href="javascript:flipVertical('flipImageVertically')">Flip Vertical</a>
                 </li>
                 <li><a href='#'>Many more .........</a>></li>
             </ul>
@@ -384,17 +239,20 @@
                 <div class="modal-body">
                     <form id='setborder' class='form-horizontal'>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio" name="borderType" value="color" onclick="javascript:showColorField()">
+                            <input type="radio" class="custom-control-input" id="customRadio" name="borderType"
+                                value="color" onclick="javascript:showColorField()">
                             <label class="custom-control-label" for="customRadio">Color</label>
-                          </div>
-                          <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio2" name="borderType" value="reflect" onclick="javascript:hideColorField()">
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio2" name="borderType"
+                                value="reflect" onclick="javascript:hideColorField()">
                             <label class="custom-control-label" for="customRadio2">Reflect</label>
-                          </div>
-                          <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio3" name="borderType" value="replicate" onclick="javascript:hideColorField()">
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio3" name="borderType"
+                                value="replicate" onclick="javascript:hideColorField()">
                             <label class="custom-control-label" for="customRadio3">Replicate</label>
-                          </div>
+                        </div>
 
                         <div class='form-group'>
                             {% csrf_token %}
@@ -419,7 +277,8 @@
                         </div>
                         <div class='form-group'>
                             <label for='width'>Select Color</label>
-                            <input class='form-control' type='color' id='borderColor' name='borderColor' style="visibility:visible">
+                            <input class='form-control' type='color' id='borderColor' name='borderColor'
+                                style="visibility:visible">
                         </div>
                     </form>
                 </div>
@@ -520,18 +379,18 @@
             output.innerHTML = slider.value;
         }
 
-        var brightnessInput=document.getElementById("brightnessInput");
-        var brightnessValue=document.getElementById("brightnessValue");
+        var brightnessInput = document.getElementById("brightnessInput");
+        var brightnessValue = document.getElementById("brightnessValue");
 
-        brightnessInput.oninput = function() {
-            brightnessValue.innerHTML=brightnessInput.value;
+        brightnessInput.oninput = function () {
+            brightnessValue.innerHTML = brightnessInput.value;
         }
 
-        var contrastInput=document.getElementById("contrastInput");
-        var contrastValue=document.getElementById("contrastValue");
+        var contrastInput = document.getElementById("contrastInput");
+        var contrastValue = document.getElementById("contrastValue");
 
-        contrastInput.oninput = function() {
-            contrastValue.innerHTML=contrastInput.value;
+        contrastInput.oninput = function () {
+            contrastValue.innerHTML = contrastInput.value;
         }
 
     </script>

@@ -11,4 +11,6 @@ path('rotateIt',views.rotateIt,name='rotateIt'),
 path('setBorder',views.setBorder,name='setBorder'),
 path('downloadFile',views.downloadFile,name='downloadFile'),
 path('enhanceImage',views.enhanceImage, name="enhanceImage"),
+path('flipImageHorizontally',views.flipImageHorizontally, name="flipImageHorizontally"),
+path('flipImageVertically',views.flipImageVertically, name="flipImageVertically"),
 ]

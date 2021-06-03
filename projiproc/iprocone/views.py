@@ -195,7 +195,6 @@ def setBorder(request):
         return HttpResponse('')
 
 def enhanceImage(request):
-    print("enhance image called")
     if request.method == 'POST' and request.session.has_key('stack'):
         brightnessValue=int(request.POST['brightnessInput'])
         contrastValue=int(request.POST['contrastInput'])
@@ -215,11 +214,6 @@ def enhanceImage(request):
     else:
         return HttpResponse('')
 
-
-
-
-    return HttpResponse('')
-
 def controller(img, brightness=255, contrast=127):
     brightness = int((brightness - 0) * (255 - (-255)) / (510 - 0) + (-255))
   
@@ -237,8 +231,7 @@ def controller(img, brightness=255, contrast=127):
         # The function addWeighted 
         # calculates the weighted sum 
         # of two arrays
-        cal = cv.addWeighted(img, al_pha,
-                              img, 0, ga_mma)
+        cal = cv.addWeighted(img, al_pha,img, 0, ga_mma)
     else:
         cal = img
     if contrast != 0:
@@ -255,6 +248,72 @@ def controller(img, brightness=255, contrast=127):
                 (10, 30), cv.FONT_HERSHEY_SIMPLEX, 
                 1, (0, 0, 255), 2)
     return cal
+
+def flipImageHorizontally(request):
+    if request.method == 'POST' and request.session.has_key('stack'):
+        stack = request.session['stack']
+        request.session['topBorderSize'] = topBorderSize
+        request.session['bottomBorderSize'] = bottomBorderSize
+        request.session['leftBorderSize'] = leftBorderSize
+        request.session['rightBorderSize'] = rightBorderSize
+        fileAbsolutePath = stack[0]
+        borderfilePath = str(Path(fileAbsolutePath).with_suffix(
+            ''))+str(uuid.uuid4())+'.png'
+        borderImage = cv.imread(fileAbsolutePath)
+        row, col = borderImage.shape[:2]
+        bottom = borderImage[row-2, row, 0:col]
+        mean = cv.mean(bottom)[0]
+        border = cv.copyMakeBorder(borderImage, top=topBorderSize, bottom=bottomBorderSize, left=leftBorderSize,
+                                   right=rightBorderSize, borderType=border, value=[mean, mean, mean])
+
+        cv.imwrite(borderfilePath, border)
+        borderFileName = borderfilePath.split('/')[-1]
+        stack.insert(0, borderFileName)
+        request.session['stack'] = stack
+        return JsonResponse({'response': 'Croped'})
+    else:
+        return HttpResponse({'response':''})    
+
+
+def flipImageVertically(request):
+    if request.method == 'GET' and request.session.has_key('stack'):
+        stack = request.session['stack']
+        if len(stack) > 0:
+            print("flipping vertically")
+            fileAbsolutePath = stack[0]
+            flipFilePath = str(
+                Path(fileAbsolutePath).with_suffix(''))+str(uuid.uuid4())+'.png'
+            flipImage = cv.imread(fileAbsolutePath)
+            flipImage = cv.flip(flipImage, 0)
+
+            cv.imwrite(flipFilePath, flipImage)
+            grayFileName = flipFilePath.split('/')[-1]
+            stack.insert(0, grayFileName)
+
+            request.session['stack'] = stack
+        return JsonResponse({'response': 'Flipped vertically'})
+    else:
+        return HttpResponse({'response':''})    
+
+def flipImageHorizontally(request):
+    if request.method == 'GET' and request.session.has_key('stack'):
+        stack = request.session['stack']
+        if len(stack) > 0:
+            print("flipping vertically")
+            fileAbsolutePath = stack[0]
+            flipFilePath = str(
+                Path(fileAbsolutePath).with_suffix(''))+str(uuid.uuid4())+'.png'
+            flipImage = cv.imread(fileAbsolutePath)
+            flipImage = cv.flip(flipImage, 1)
+
+            cv.imwrite(flipFilePath, flipImage)
+            grayFileName = flipFilePath.split('/')[-1]
+            stack.insert(0, grayFileName)
+
+            request.session['stack'] = stack
+        return JsonResponse({'response': 'Flipped vertically'})
+    else:
+        return HttpResponse({'response':''})    
 
 def downloadFile(request):
     fileResponse = open(
