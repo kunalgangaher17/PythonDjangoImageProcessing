@@ -44,6 +44,34 @@
             document.getElementById("borderColor").style.visibility = 'visible';
         }
 
+        document.addEventListener("DOMContentLoaded", function(){
+  document.querySelectorAll('.sidebar .nav-link').forEach(function(element){
+    
+    element.addEventListener('click', function (e) {
+
+      let nextEl = element.nextElementSibling;
+      let parentEl  = element.parentElement;	
+
+        if(nextEl) {
+            e.preventDefault();	
+            let mycollapse = new bootstrap.Collapse(nextEl);
+            
+            if(nextEl.classList.contains('show')){
+              mycollapse.hide();
+            } else {
+                mycollapse.show();
+                // find other submenus with class=show
+                var opened_submenu = parentEl.parentElement.querySelector('.submenu.show');
+                // if it exists, then close all of them
+                if(opened_submenu){
+                  new bootstrap.Collapse(opened_submenu);
+                }
+            }
+        }
+    }); // addEventListener
+  }) // forEach
+}); 
+
 
     </script>
 
@@ -76,11 +104,31 @@
                     <a href="javascript:$('#enhanceImageModal').modal('show')">Enhance Image</a>
                 </li>
                 <li>
-                    <a href="javascript:flipHorizontal('flipImageHorizontally')">Flip Horizontal</a>
-                </li>
+					<a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Flip</a>
+					<ul class="collapse list-unstyled" id="homeSubmenu">
+						<li>
+							<a href="javascript:flipHorizontal('flipImageHorizontally')">Horizontal</a>
+						</li>
+						<li>
+							<a href="javascript:flipVertical('flipImageVertically')">Vertical</a>
+						</li>
+					</ul> 
+				</li>            
+                <li><a href='#'>Add Watermark</a></li>
                 <li>
-                    <a href="javascript:flipVertical('flipImageVertically')">Flip Vertical</a>
-                </li>
+					<a href="#filterSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Add Filter</a>
+					<ul class="collapse list-unstyled" id="filterSubmenu">
+						<li>
+							<a href="javascript:addFilter('Blur')">Blur</a>
+						</li>
+						<li>
+							<a href="javascript:addFilter('Sharpen')">Sharpen</a>
+						</li>
+						<li>
+							<a href="javascript:addFilter('Negative')">Negative</a>
+						</li>
+					</ul> 
+				</li>            
                 <li><a href='#'>Many more .........</a>></li>
             </ul>
         </nav>

@@ -72,6 +72,24 @@ function openFile() {
     });
 }
 
+function addFilter(filterType)
+{
+    $('#spinnerWrap').css('display', '');
+    $('#spinnerWrap').css('visibility', 'visible');
+    $('#spinnerWrap').show();
+    $.ajax({
+        url: "filterImage",
+        type: "POST",
+        cache: false,
+        data: {"filterType": filterType},
+        success: function (res) {
+            updateView(); $('#spinnerWrap').css('display', 'none');
+            $('#spinnerWrap').css('visibility', 'hidden');
+            $('#spinnerWrap').hide();
+        }
+    });
+}
+
 function flipHorizontal(flipURL)
 {
     $('#spinnerWrap').css('display', '');

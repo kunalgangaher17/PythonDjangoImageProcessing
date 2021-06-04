@@ -6,6 +6,7 @@ import os
 import cv2 as cv
 import uuid
 from pathlib import Path
+import numpy as np
 
 
 def index(request):
@@ -243,37 +244,8 @@ def controller(img, brightness=255, contrast=127):
                               cal, 0, Gamma)
     # putText renders the specified
     # text string in the image.
-    cv.putText(cal, ''.format(brightness, 
-                                        contrast), 
-                (10, 30), cv.FONT_HERSHEY_SIMPLEX, 
-                1, (0, 0, 255), 2)
+    cv.putText(cal, ''.format(brightness, contrast), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     return cal
-
-def flipImageHorizontally(request):
-    if request.method == 'POST' and request.session.has_key('stack'):
-        stack = request.session['stack']
-        request.session['topBorderSize'] = topBorderSize
-        request.session['bottomBorderSize'] = bottomBorderSize
-        request.session['leftBorderSize'] = leftBorderSize
-        request.session['rightBorderSize'] = rightBorderSize
-        fileAbsolutePath = stack[0]
-        borderfilePath = str(Path(fileAbsolutePath).with_suffix(
-            ''))+str(uuid.uuid4())+'.png'
-        borderImage = cv.imread(fileAbsolutePath)
-        row, col = borderImage.shape[:2]
-        bottom = borderImage[row-2, row, 0:col]
-        mean = cv.mean(bottom)[0]
-        border = cv.copyMakeBorder(borderImage, top=topBorderSize, bottom=bottomBorderSize, left=leftBorderSize,
-                                   right=rightBorderSize, borderType=border, value=[mean, mean, mean])
-
-        cv.imwrite(borderfilePath, border)
-        borderFileName = borderfilePath.split('/')[-1]
-        stack.insert(0, borderFileName)
-        request.session['stack'] = stack
-        return JsonResponse({'response': 'Croped'})
-    else:
-        return HttpResponse({'response':''})    
-
 
 def flipImageVertically(request):
     if request.method == 'GET' and request.session.has_key('stack'):
@@ -299,7 +271,6 @@ def flipImageHorizontally(request):
     if request.method == 'GET' and request.session.has_key('stack'):
         stack = request.session['stack']
         if len(stack) > 0:
-            print("flipping vertically")
             fileAbsolutePath = stack[0]
             flipFilePath = str(
                 Path(fileAbsolutePath).with_suffix(''))+str(uuid.uuid4())+'.png'
@@ -311,6 +282,33 @@ def flipImageHorizontally(request):
             stack.insert(0, grayFileName)
 
             request.session['stack'] = stack
+        return JsonResponse({'response': 'Flipped vertically'})
+    else:
+        return HttpResponse({'response':''})    
+
+def filterImage(request):
+    if request.method=='POST' and request.session.has_key('stack'):
+        stack=request.session['stack']
+        filterType=request.POST['filterType']
+
+        fileAbsolutePath = stack[0]
+        filterFilePath = str(
+                Path(fileAbsolutePath).with_suffix(''))+str(uuid.uuid4())+'.png'
+        filterImage = cv.imread(fileAbsolutePath)
+
+        if filterType=='Blur':
+            filteredImage = cv.blur(filterImage,(10,10))
+        elif filterType=='Sharpen':
+            kernel_sharpening = np.array([[-1,-1,-1], [-1, 9,-1], [-1,-1,-1]])
+            filteredImage = cv.filter2D(filterImage, -1, kernel_sharpening)
+        elif filterType=='Negative':
+            filteredImage = cv.bitwise_not(filterImage)
+    
+        cv.imwrite(filterFilePath,filteredImage)    
+        filterFileName = filterFilePath.split('/')[-1]
+        stack.insert(0, filterFileName)
+
+        request.session['stack'] = stack
         return JsonResponse({'response': 'Flipped vertically'})
     else:
         return HttpResponse({'response':''})    
