@@ -60,9 +60,7 @@
               mycollapse.hide();
             } else {
                 mycollapse.show();
-                // find other submenus with class=show
                 var opened_submenu = parentEl.parentElement.querySelector('.submenu.show');
-                // if it exists, then close all of them
                 if(opened_submenu){
                   new bootstrap.Collapse(opened_submenu);
                 }
@@ -161,8 +159,9 @@
             </nav>
             <div id='topBar' class='topBar' style='visibility:hidden'>
                 <span class='imageFileName' id='imageFileName'></span>
-                <a href="downloadFile">Download Files</a>
-                <span class='currentDate'>{{ today }}</span>
+                <!--<a href="downloadFile">Download Files</a>
+                <span class='currentDate'>{{ today }}</span>-->
+                <a href='download_zipfile' >Download</a>
             </div>
             <div id='clientArea'>
                 <div id='openFileDivision'>

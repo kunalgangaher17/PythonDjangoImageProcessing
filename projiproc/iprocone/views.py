@@ -7,7 +7,9 @@ import cv2 as cv
 import uuid
 from pathlib import Path
 import numpy as np
-
+import zipfile
+from zipfile import ZipFile
+import io
 
 def index(request):
     today = datetime.datetime.now()
@@ -240,8 +242,7 @@ def controller(img, brightness=255, contrast=127):
         Gamma = 127 * (1 - Alpha)
         # The function addWeighted calculates
         # the weighted sum of two arrays
-        cal = cv.addWeighted(cal, Alpha,
-                              cal, 0, Gamma)
+        cal = cv.addWeighted(cal, Alpha, cal, 0, Gamma)
     # putText renders the specified
     # text string in the image.
     cv.putText(cal, ''.format(brightness, contrast), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
@@ -319,4 +320,25 @@ def downloadFile(request):
     return fileResponse
     # return JsonResponse({'response':'Download file'})
 
+def download_zipfile(request):
+  stack=request.session['stack']
+  for i in stack:
+      print(i)
+  filelist = ['F:\PythonDjangoProject\django\projiproc\iprocone\hello.zip']
+  byte_data = io.BytesIO()
+  #zip_name = "%s.zip" % MyModel.id_no
+  zip_name = 'hello.zip'
+  zip_file = zipfile.ZipFile(byte_data, 'w')
+
+  for file in filelist:
+    filename = os.path.basename(os.path.normpath(file))
+    zip_file.write(file, filename)
+  zip_file.close()
+
+  response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
+  response['Content-Disposition'] = 'attachment; filename=%s' %zip_name
+
+  zip_file.printdir()
+
+  return response
 # Create your views here.
