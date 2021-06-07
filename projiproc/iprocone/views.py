@@ -329,7 +329,6 @@ def download_zipfile(request):
   for i in stack:
       fileName=os.path.basename(os.path.normpath(i))
       zipObj.write(i,fileName)
-      print(i)
   zipObj.close()
   response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
   response['Content-Disposition'] = 'attachment; filename=%s' %zip_name
@@ -337,4 +336,15 @@ def download_zipfile(request):
   #zip_file.printdir()
 
   return response
-# Create your views here.
+# Create your views here
+
+def undo(request):
+    if request.method=="GET" and request.session.has_key('stack') and len(request.session['stack'])>1:
+        stack=request.session['stack']
+        fileDelete=stack.pop(0)
+        #fileDelete=os.path.abspath(os.path.join(os.path.dirname(__file__),'..','filestore/%s'%stack.pop(0)))
+        os.remove(fileDelete)
+        request.session['stack']=stack
+        return JsonResponse({"response":"undid"})
+    else:
+        return HttpResponse('')

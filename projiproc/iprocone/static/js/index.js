@@ -90,6 +90,7 @@ function addFilter(filterType)
     });
 }
 
+
 function flipHorizontal(flipURL)
 {
     $('#spinnerWrap').css('display', '');

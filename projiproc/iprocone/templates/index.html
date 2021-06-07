@@ -70,6 +70,24 @@
   }) // forEach
 }); 
 
+function undo()
+{
+    $('#spinnerWrap').css('display','');
+    $('#spinnerWrap').css('visibility','visible');
+    $('#spinnerWrap').show();
+    $.ajax({
+        url:"undo",
+        type:"GET",
+        cache:false,
+        success:function(res){
+        updateView();
+        $('#spinnerWrap').css('display','none');
+        $('#spinnerWrap').css('visibility','hidden');
+        $('#spinnerWrap').hide();   
+        }
+});
+}
+
 
     </script>
 
@@ -152,6 +170,7 @@
                                 <li class="nav-item active">
                                     <a class="nav-link" href="javascript:closeFile()">Close file</a>
                                 </li>
+                                
                             </ul>
                         </div>
                     </span>
@@ -159,9 +178,10 @@
             </nav>
             <div id='topBar' class='topBar' style='visibility:hidden'>
                 <span class='imageFileName' id='imageFileName'></span>
-                <!--<a href="downloadFile">Download Files</a>
-                <span class='currentDate'>{{ today }}</span>-->
-                <a href='download_zipfile' >Download</a>
+                <!--<a href="downloadFile">Download Files</a>-->
+                <span class='currentDate'>{{ today }}</span>
+                <a href='download_zipfile' style="background:green;margin-left:50px;margin-right:10px">Download</a>
+                <button type="button" class="btn" onclick="undo()" style="background:orange;margin-left:50px;margin-right:10px">Undo</button>
             </div>
             <div id='clientArea'>
                 <div id='openFileDivision'>
