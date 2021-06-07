@@ -322,23 +322,19 @@ def downloadFile(request):
 
 def download_zipfile(request):
   stack=request.session['stack']
+  zip_name="ImageProcessingTestImages.zip"
+  byte_data=io.BytesIO()
+  zipObj=zipfile.ZipFile(byte_data, 'w') 
+  index=0
   for i in stack:
+      fileName=os.path.basename(os.path.normpath(i))
+      zipObj.write(i,fileName)
       print(i)
-  filelist = ['F:\PythonDjangoProject\django\projiproc\iprocone\hello.zip']
-  byte_data = io.BytesIO()
-  #zip_name = "%s.zip" % MyModel.id_no
-  zip_name = 'hello.zip'
-  zip_file = zipfile.ZipFile(byte_data, 'w')
-
-  for file in filelist:
-    filename = os.path.basename(os.path.normpath(file))
-    zip_file.write(file, filename)
-  zip_file.close()
-
+  zipObj.close()
   response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
   response['Content-Disposition'] = 'attachment; filename=%s' %zip_name
 
-  zip_file.printdir()
+  #zip_file.printdir()
 
   return response
 # Create your views here.
