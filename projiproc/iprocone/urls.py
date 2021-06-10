@@ -16,4 +16,5 @@ path('flipImageVertically',views.flipImageVertically, name="flipImageVertically"
 path('filterImage',views.filterImage, name="filterImage"),
 path('download_zipfile', views.download_zipfile, name='download_zipfile'),
 path('undo', views.undo, name='undo'),
+path('addWatermark', views.addWatermark, name='addWatermark'),
 ]

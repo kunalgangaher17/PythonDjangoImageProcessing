@@ -10,6 +10,7 @@ import numpy as np
 import zipfile
 from zipfile import ZipFile
 import io
+from colormap import hex2rgb
 
 def index(request):
     today = datetime.datetime.now()
@@ -346,5 +347,54 @@ def undo(request):
         os.remove(fileDelete)
         request.session['stack']=stack
         return JsonResponse({"response":"undid"})
+    else:
+        return HttpResponse('')
+
+def addWatermark(request):
+    if request.method == 'POST' and request.session.has_key('stack'):
+        xCoordinate = int(request.POST['xCoordinate'])
+        yCoordinate = int(request.POST['yCoordinate'])
+        Watermark = str(request.POST['Watermark'])
+        borderColor = request.POST['borderColor']
+        thicknessValue = int(request.POST['thicknessRange'])
+        fontScaleValue=int(request.POST['fontScaleRange'])
+        transparencyValue=int(request.POST['transparencyRange'])
+
+
+        stack = request.session['stack']
+        request.session['xCoordinate'] = xCoordinate
+        request.session['yCoordinate'] = yCoordinate
+        request.session['Watermark'] = Watermark
+        request.session['borderColor'] = borderColor
+        request.session['thicknessValue'] = thicknessValue
+        request.session['fontScaleValue'] = fontScaleValue
+        request.session['transparencyValue'] = transparencyValue
+        fileAbsolutePath = stack[0]
+
+        coordinates=(xCoordinate, yCoordinate)
+        borderfilePath = str(Path(fileAbsolutePath).with_suffix(
+            ''))+str(uuid.uuid4())+'.png'
+        borderImage = cv.imread(fileAbsolutePath)
+        color = (255, 0, 0)
+        font = cv.FONT_HERSHEY_SIMPLEX
+        org = (50, 50)
+        fontScale = 1
+        color=hex2rgb(borderColor)
+
+#        color=tuple(int(borderColor[i:i+2], 16) for i in (0, 2, 4))
+#        color = (255, 0, 0)
+        #color=hex2rgb(borderColor)
+        thickness = 2
+        border = cv.putText(borderImage, Watermark, org, font, 
+                   fontScale, color, thickness, cv.LINE_AA)
+
+
+        #border = cv.putText(borderImage, Watermark, coordinates, cv.FONT_HERSHEY_SIMPLEX,fontScaleValue, color, thicknessValue,cv.LINE_AA)
+
+        cv.imwrite(borderfilePath, border)
+        borderFileName = borderfilePath.split('/')[-1]
+        stack.insert(0, borderFileName)
+        request.session['stack'] = stack
+        return JsonResponse({'response': 'Croped'})
     else:
         return HttpResponse('')

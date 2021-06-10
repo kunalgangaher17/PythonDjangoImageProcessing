@@ -15,6 +15,7 @@
     <script defer src="{% static 'fontawesome/solid.js' %}"></script>
     <script defer src="{% static 'fontawesome/fontawesome.js' %}"></script>
     <script defer src="{% static 'bootstrap-4/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'popper/popper.min.js' %}"></script>
 
     <script>
         function ViewState() {
@@ -89,6 +90,7 @@ function undo()
 }
 
 
+
     </script>
 
     <script defer src="{% static 'js/index.js' %}"></script>
@@ -130,7 +132,7 @@ function undo()
 						</li>
 					</ul> 
 				</li>            
-                <li><a href='#'>Add Watermark</a></li>
+                <li><a href="javascript:$('#waterMarkModal').modal('show')">Add Watermark</a></li>
                 <li>
 					<a href="#filterSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Add Filter</a>
 					<ul class="collapse list-unstyled" id="filterSubmenu">
@@ -145,7 +147,6 @@ function undo()
 						</li>
 					</ul> 
 				</li>            
-                <li><a href='#'>Many more .........</a>></li>
             </ul>
         </nav>
         <!-- Page Content Holder -->
@@ -400,10 +401,85 @@ function undo()
 
     <!--Enhance Image Modal end-->
 
+    <!-- Add Watermark modal started -->
+    <div class="modal fade" id="waterMarkModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Watermark</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id='addWatermark' class='form-horizontal'>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="textRadio" name="borderType"
+                                value="text">
+                            <label class="custom-control-label" for="textRadio">TEXT</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio1" name="borderType"
+                                value="image">
+                            <label class="custom-control-label" for="customRadio1">IMAGE</label>
+                        </div>
+
+                        <div class='form-group'>
+                            {% csrf_token %}
+                            <label for='width'>X-Coordinate</label>
+                            <input class='form-control' type='number' min='0' max='200' step='1' value='100'
+                                id='xCordinate' name='xCoordinate'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='width'>Y-Coordinate</label>
+                            <input class='form-control' type='number' min='0' max='200' step='1' value='100'
+                                id='yCoordinate' name='yCoordinate'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='width'>Watermark</label>
+                            <input class='form-control' type='text' value='Watermark'
+                                id='Watermark' name='Watermark'>
+                        </div>
+                        <div class='form-group'>
+                            <label for='width'>Select Color</label>
+                            <input class='form-control' type='color' id='borderColor' name='borderColor'
+                                style="visibility:visible">
+                        </div>
+                        <div class="slidecontainer">
+                            <label for='maintainAspectRation'>Font Thickness</label>
+                            <input type="range" min="1" max="360" value="50" class="slider" id="thicknessRange"
+                                name="thicknessRange" , style="width: 100%">
+                            <p>Thickness Value: <span id="thicknessValue" name="thicknessValue"></span></p>
+                        </div>
+                        <div class="slidecontainer">
+                            <label for='maintainAspectRation'>Font Scale</label>
+                            <input type="range" min="1" max="360" value="50" class="slider" id="fontScaleRange"
+                                name="fontScaleRange" , style="width: 100%">
+                            <p>Font Scale Value: <span id="fontScaleValue" name="fontScaleValue"></span></p>
+                        </div>
+                        <div class="slidecontainer">
+                            <label for='maintainAspectRation'>Transparency</label>
+                            <input type="range" min="1" max="360" value="50" class="slider" id="transparencyRange"
+                                name="transparencyRange" , style="width: 100%">
+                            <p>Transparency Value: <span id="transparencyValue" name="transparencyValue"></span></p>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="javascript:addWatermark()"
+                        data-dismiss="modal">Add</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add Water mark modal end -->
+
     <!-- jQuery CDN - Slim version (=without AJAX) -->
     <script src="{% static 'jquery-3.3.1/jquery.min.js' %}"></script>
     <!-- Popper.JS -->
-    <script src="{% static 'popper/popper.min.js' %}"></script>
+<!--    <script src="{% static 'popper/popper.min.js' %}"></script>-->
     <!-- Bootstrap JS -->
     <script src="{% static 'bootstrap-4/js/bootstrap.min.js' %}"></script>
     <script type="text/javascript">
@@ -439,7 +515,31 @@ function undo()
         window.addEventListener('load', initializeState);
         var slider = document.getElementById("angleRange");
         var output = document.getElementById("angleValue");
+
+        var thicknessRange=document.getElementById("thicknessRange");
+        var thicknessValue=document.getElementById("thicknessValue");
+        var transparencyRange=document.getElementById("transparencyRange");
+
+        var fontScaleRange=document.getElementById("fontScaleRange");
+        var fontScaleValue=document.getElementById("fontScaleValue");
+        var transparencyValue=document.getElementById("transparencyValue");
+
+        thicknessValue.innerHTML=thicknessRange.value;
+        fontScaleValue.innerHTML=fontScaleRange.value;
+        transparencyValue.innerHTML=transparencyRange.value;
         output.innerHTML = slider.value; // Display the default slider value
+
+        transparencyRange.oninput=function(){
+            transparencyValue.innerHTML=transparencyRange.value;
+        }
+
+        thicknessRange.oninput=function(){
+            thicknessValue.innerHTML=thicknessRange.value;
+        }
+
+        fontScaleRange.oninput=function(){
+            fontScaleValue.innerHTML=fontScaleRange.value;
+        }
 
         // Update the current slider value (each time you drag the slider handle)
         slider.oninput = function () {

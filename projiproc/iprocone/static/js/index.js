@@ -72,6 +72,23 @@ function openFile() {
     });
 }
 
+function addWatermark()
+{
+    var watermarkForm = document.getElementById('addWatermark')
+    var formData = new FormData(watermarkForm)
+
+    $.ajax({
+        url: "addWatermark",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        cache: false,
+        success: function (response) {
+            updateView()
+        }
+    });
+}
 function addFilter(filterType)
 {
     $('#spinnerWrap').css('display', '');
