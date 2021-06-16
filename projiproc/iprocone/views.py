@@ -108,11 +108,9 @@ def scaleIt(request):
         if len(stack) > 0:
             newX = int(request.POST['newWidth'])
             newY = int(request.POST['newHeight'])
-            print("New X :"+str(newX)+", newY :"+str(newY))
             request.session['size'] = (newX, newY)
             fileAbsolutePath = stack[0]
-            print(
-                "File path from stack[0] from ScaleIt method :"+str(stack[0]))
+
             scaledFilePath = str(Path(fileAbsolutePath).with_suffix(
                 ''))+str(uuid.uuid4())+'.png'
             originalImage = cv.imread(fileAbsolutePath)
@@ -140,7 +138,6 @@ def rotateIt(request):
             rotateImage = cv.imread(fileAbsolutePath)
             (h, w) = rotateImage.shape[:2]
             center = (w/2, h/2)
-            print(request.POST.__dict__)
             angle = int(request.POST['angleRange'])
             scale = 1.0
             M = cv.getRotationMatrix2D(center, angle, scale)
@@ -240,7 +237,6 @@ def flipImageVertically(request):
     if request.method == 'GET' and request.session.has_key('stack'):
         stack = request.session['stack']
         if len(stack) > 0:
-            print("flipping vertically")
             fileAbsolutePath = stack[0]
             flipFilePath = str(
                 Path(fileAbsolutePath).with_suffix(''))+str(uuid.uuid4())+'.png'
@@ -356,7 +352,6 @@ def addWatermark(request):
 
         if 'textRadio' in request.POST:
             textWatermark=str(request.POST['textRadio'])
-            print('Text water mark :'+textWatermark)
             borderColor = request.POST['borderColor']
             thicknessValue = int(request.POST['thicknessRange'])
             fontScaleValue=int(request.POST['fontScaleRange'])
@@ -397,7 +392,6 @@ def addWatermark(request):
 
             logo = cv.imread(stdImagePath)
             h_logo, w_logo, _ = logo.shape
-            print("Adding watermark")
 
 #            img = cv2.imread("ImageForProject1.jpg")
             img = watermarkImage
