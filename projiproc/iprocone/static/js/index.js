@@ -72,10 +72,34 @@ function openFile() {
     });
 }
 
+function openFileForWaterMark()
+{
+    var openFileForm = document.getElementById('openFileForm');
+    var formData = new FormData(openFileForm);
+    viewState.state = 'opening';
+    updateView();
+    $('#spinnerWrap').css('display', '');
+    $('#spinnerWrap').css('visibility', 'visible');
+    $('#spinnerWrap').show();
+    $.ajax({
+        url: "openFile",
+        type: "POST",
+        data: formData,
+        enctype: 'multipart/form-data',
+        processData: false, contentType: false,
+        cache: false,
+        success: function (res) {
+        }
+    });
+
+}
+
 function addWatermark()
 {
     var watermarkForm = document.getElementById('addWatermark')
     var formData = new FormData(watermarkForm)
+    console.log("Text radio value :"+formData.get('textRadio'));
+    console.log("Custom radio value :"+formData.get('customRadio1'));
 
     $.ajax({
         url: "addWatermark",

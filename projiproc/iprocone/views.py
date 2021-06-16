@@ -54,13 +54,11 @@ def openFile(request):
         stdImage = cv.resize(image, dim, interpolation=cv.INTER_AREA)
         stdImagePath = str(Path(imagePath).with_suffix('')) + \
             str(uuid.uuid4())[-3:]+'.png'
-        print(stdImagePath)
         cv.imwrite(stdImagePath, stdImage)
         stdFileName = stdImagePath.split('/')[-1]
 
         stack.append(stdFileName)
         request.session['stack'] = stack
-        print(image.shape)
 
     return JsonResponse({'fileName': imageFileName})
 
@@ -137,7 +135,6 @@ def rotateIt(request):
         stack = request.session['stack']
         if len(stack) > 0:
             fileAbsolutePath = stack[0]
-            # here dirty coding......
             rotatefilepath = str(Path(fileAbsolutePath).with_suffix(
                 ''))+str(uuid.uuid4())+'.png'
             rotateImage = cv.imread(fileAbsolutePath)
@@ -202,7 +199,6 @@ def enhanceImage(request):
     if request.method == 'POST' and request.session.has_key('stack'):
         brightnessValue=int(request.POST['brightnessInput'])
         contrastValue=int(request.POST['contrastInput'])
-        #print("Brightness :"+brightnessValue+"Contrast value :"+contrastValue)
         stack = request.session['stack']
         fileAbsolutePath = stack[0]
         enahnceImagefilePath = str(Path(fileAbsolutePath).with_suffix(
@@ -220,9 +216,7 @@ def enhanceImage(request):
 
 def controller(img, brightness=255, contrast=127):
     brightness = int((brightness - 0) * (255 - (-255)) / (510 - 0) + (-255))
-  
     contrast = int((contrast - 0) * (127 - (-127)) / (254 - 0) + (-127))
-  
     if brightness != 0:
         if brightness > 0:
             shadow = brightness
@@ -232,20 +226,13 @@ def controller(img, brightness=255, contrast=127):
             max = 255 + brightness
         al_pha = (max - shadow) / 255
         ga_mma = shadow
-        # The function addWeighted 
-        # calculates the weighted sum 
-        # of two arrays
         cal = cv.addWeighted(img, al_pha,img, 0, ga_mma)
     else:
         cal = img
     if contrast != 0:
         Alpha = float(131 * (contrast + 127)) / (127 * (131 - contrast))
         Gamma = 127 * (1 - Alpha)
-        # The function addWeighted calculates
-        # the weighted sum of two arrays
         cal = cv.addWeighted(cal, Alpha, cal, 0, Gamma)
-    # putText renders the specified
-    # text string in the image.
     cv.putText(cal, ''.format(brightness, contrast), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     return cal
 
@@ -334,8 +321,6 @@ def download_zipfile(request):
   response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
   response['Content-Disposition'] = 'attachment; filename=%s' %zip_name
 
-  #zip_file.printdir()
-
   return response
 # Create your views here
 
@@ -355,45 +340,90 @@ def addWatermark(request):
         xCoordinate = int(request.POST['xCoordinate'])
         yCoordinate = int(request.POST['yCoordinate'])
         Watermark = str(request.POST['Watermark'])
-        borderColor = request.POST['borderColor']
-        thicknessValue = int(request.POST['thicknessRange'])
-        fontScaleValue=int(request.POST['fontScaleRange'])
         transparencyValue=int(request.POST['transparencyRange'])
 
-
-        stack = request.session['stack']
         request.session['xCoordinate'] = xCoordinate
         request.session['yCoordinate'] = yCoordinate
         request.session['Watermark'] = Watermark
-        request.session['borderColor'] = borderColor
-        request.session['thicknessValue'] = thicknessValue
-        request.session['fontScaleValue'] = fontScaleValue
         request.session['transparencyValue'] = transparencyValue
+
+        stack = request.session['stack']
         fileAbsolutePath = stack[0]
 
-        coordinates=(xCoordinate, yCoordinate)
-        borderfilePath = str(Path(fileAbsolutePath).with_suffix(
-            ''))+str(uuid.uuid4())+'.png'
-        borderImage = cv.imread(fileAbsolutePath)
-        color = (255, 0, 0)
-        font = cv.FONT_HERSHEY_SIMPLEX
-        org = (50, 50)
-        fontScale = 1
-        color=hex2rgb(borderColor)
+        watermarkFilePath = str(Path(fileAbsolutePath).with_suffix(
+                ''))+str(uuid.uuid4())+'.png'
+        watermarkImage = cv.imread(fileAbsolutePath)
 
-#        color=tuple(int(borderColor[i:i+2], 16) for i in (0, 2, 4))
-#        color = (255, 0, 0)
-        #color=hex2rgb(borderColor)
-        thickness = 2
-        border = cv.putText(borderImage, Watermark, org, font, 
-                   fontScale, color, thickness, cv.LINE_AA)
+        if 'textRadio' in request.POST:
+            textWatermark=str(request.POST['textRadio'])
+            print('Text water mark :'+textWatermark)
+            borderColor = request.POST['borderColor']
+            thicknessValue = int(request.POST['thicknessRange'])
+            fontScaleValue=int(request.POST['fontScaleRange'])
+
+            request.session['borderColor'] = borderColor
+            request.session['thicknessValue'] = thicknessValue
+            request.session['fontScaleValue'] = fontScaleValue
+
+            coordinates=(xCoordinate, yCoordinate)
+
+            color = (255, 0, 0)
+            font = cv.FONT_HERSHEY_SIMPLEX
+            org = (50, 50)
+            fontScale = 1
+            color=hex2rgb(borderColor)
+
+    #        color=tuple(int(borderColor[i:i+2], 16) for i in (0, 2, 4))
+    #        color = (255, 0, 0)
+            thickness = 2
+            border = cv.putText(watermarkImage, Watermark, org, font, 
+                    fontScale, color, thickness, cv.LINE_AA)
+            #border = cv.putText(borderImage, Watermark, coordinates, cv.FONT_HERSHEY_SIMPLEX,fontScaleValue, color, thicknessValue,cv.LINE_AA)
+        elif 'customRadio1' in request.POST:
+            imageFile = request.FILES['fileName']
+            fileSystemStorage = FileSystemStorage()
+            imageFileName = fileSystemStorage.save(imageFile.name, imageFile)
+            imagePath = os.path.abspath(os.path.join(os.path.dirname(
+                __file__), '..', 'filestore/%s' % imageFileName))
+            image = cv.imread(imagePath)
+            (h, w) = image.shape[:2]
+            r = 500/float(h)
+            dim = (int(w*r), 500)
+
+            stdImage = cv.resize(image, dim, interpolation=cv.INTER_AREA)
+            stdImagePath = str(Path(imagePath).with_suffix('')) + \
+                str(uuid.uuid4())[-3:]+'.png'
+            cv.imwrite(stdImagePath, stdImage)
+
+            logo = cv.imread(stdImagePath)
+            h_logo, w_logo, _ = logo.shape
+            print("Adding watermark")
+
+#            img = cv2.imread("ImageForProject1.jpg")
+            img = watermarkImage
+
+            h_img, w_img, _ = img.shape
+
+            center_y = int(h_img / 2)
+            center_x = int(w_img / 2)
+            top_y = center_y - int(h_logo / 2)
+            left_x = center_x - int(w_logo / 2)
+            bottom_y = top_y + h_logo
+            right_x = left_x + w_logo
+
+            # Get ROI
+            roi = img[top_y: bottom_y, left_x: right_x]
+                # Add the Logo to the Roi
+            result = cv.addWeighted(roi, 1, logo, 0.3, 0)
+                # Replace the ROI on the image
+            img[top_y: bottom_y, left_x: right_x] = result
+            border=img
 
 
-        #border = cv.putText(borderImage, Watermark, coordinates, cv.FONT_HERSHEY_SIMPLEX,fontScaleValue, color, thicknessValue,cv.LINE_AA)
 
-        cv.imwrite(borderfilePath, border)
-        borderFileName = borderfilePath.split('/')[-1]
-        stack.insert(0, borderFileName)
+        cv.imwrite(watermarkFilePath, border)
+        watermarkFileName = watermarkFilePath.split('/')[-1]
+        stack.insert(0, watermarkFileName)
         request.session['stack'] = stack
         return JsonResponse({'response': 'Croped'})
     else:

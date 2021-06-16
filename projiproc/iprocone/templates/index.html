@@ -89,12 +89,23 @@ function undo()
 });
 }
 
+function textWatermark()
+{
+console.log("text watermark called.");
+$('#watermarkXCoordinate').show();
+$('#watermarkYCoordinate').show();
+}
 
-
+function imageWatermark()
+{
+    console.log("Image watermark called.");
+    $('#watermarkColor').hide();
+    $('#watermarkThickness').hide();
+    $('#watermarkScale').hide();
+    $('#watermarkImage').show();
+}
     </script>
-
     <script defer src="{% static 'js/index.js' %}"></script>
-
 </head>
 
 <body>
@@ -414,23 +425,23 @@ function undo()
                 <div class="modal-body">
                     <form id='addWatermark' class='form-horizontal'>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="textRadio" name="borderType"
+                            <input type="radio" class="custom-control-input" id="textRadio" name="textRadio"
                                 value="text">
-                            <label class="custom-control-label" for="textRadio">TEXT</label>
+                            <label class="custom-control-label" for="textRadio" onclick="javascript:textWatermark()">TEXT</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="customRadio1" name="borderType"
+                            <input type="radio" class="custom-control-input" id="customRadio1" name="customRadio1"
                                 value="image">
-                            <label class="custom-control-label" for="customRadio1">IMAGE</label>
+                            <label class="custom-control-label" for="customRadio1" onclick="javascript:imageWatermark()">IMAGE</label>
                         </div>
 
-                        <div class='form-group'>
+                        <div class='form-group' id="watermarkXCoordinate">
                             {% csrf_token %}
                             <label for='width'>X-Coordinate</label>
                             <input class='form-control' type='number' min='0' max='200' step='1' value='100'
                                 id='xCordinate' name='xCoordinate'>
                         </div>
-                        <div class='form-group'>
+                        <div class='form-group' id="watermarkYCoordinate">
                             <label for='width'>Y-Coordinate</label>
                             <input class='form-control' type='number' min='0' max='200' step='1' value='100'
                                 id='yCoordinate' name='yCoordinate'>
@@ -440,18 +451,19 @@ function undo()
                             <input class='form-control' type='text' value='Watermark'
                                 id='Watermark' name='Watermark'>
                         </div>
-                        <div class='form-group'>
+
+                        <div class='form-group' id="watermarkColor">
                             <label for='width'>Select Color</label>
                             <input class='form-control' type='color' id='borderColor' name='borderColor'
                                 style="visibility:visible">
                         </div>
-                        <div class="slidecontainer">
+                        <div class="slidecontainer" id="watermarkThickness">
                             <label for='maintainAspectRation'>Font Thickness</label>
                             <input type="range" min="1" max="360" value="50" class="slider" id="thicknessRange"
                                 name="thicknessRange" , style="width: 100%">
                             <p>Thickness Value: <span id="thicknessValue" name="thicknessValue"></span></p>
                         </div>
-                        <div class="slidecontainer">
+                        <div class="slidecontainer" id="watermarkScale">
                             <label for='maintainAspectRation'>Font Scale</label>
                             <input type="range" min="1" max="360" value="50" class="slider" id="fontScaleRange"
                                 name="fontScaleRange" , style="width: 100%">
@@ -462,6 +474,10 @@ function undo()
                             <input type="range" min="1" max="360" value="50" class="slider" id="transparencyRange"
                                 name="transparencyRange" , style="width: 100%">
                             <p>Transparency Value: <span id="transparencyValue" name="transparencyValue"></span></p>
+                        </div>
+                        <div class='form-group' id="watermarkImage">
+                            <label for='width'>Watermark</label>
+                            <input class='form-control' type='file' id='fileName' name='fileName' accept='image/*'>
                         </div>
                     </form>
                 </div>
@@ -515,6 +531,7 @@ function undo()
         window.addEventListener('load', initializeState);
         var slider = document.getElementById("angleRange");
         var output = document.getElementById("angleValue");
+        $('#watermarkImage').hide();
 
         var thicknessRange=document.getElementById("thicknessRange");
         var thicknessValue=document.getElementById("thicknessValue");
