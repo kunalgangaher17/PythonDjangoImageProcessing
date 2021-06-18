@@ -91,14 +91,14 @@ function undo()
 
 function textWatermark()
 {
-console.log("text watermark called.");
-$('#watermarkXCoordinate').show();
-$('#watermarkYCoordinate').show();
+    $('#watermarkColor').show();
+    $('#watermarkThickness').show();
+    $('#watermarkScale').show();
+    $('#watermarkImage').hide();
 }
 
 function imageWatermark()
 {
-    console.log("Image watermark called.");
     $('#watermarkColor').hide();
     $('#watermarkThickness').hide();
     $('#watermarkScale').hide();

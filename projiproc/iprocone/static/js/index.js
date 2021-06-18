@@ -43,6 +43,13 @@ function closeFile() {
 }
 
 function openFile() {
+    var emailValue=$('#email').val();
+    var nameValue=$('#name').val();
+    if(emailValue==null || nameValue==null || emailValue.trim().length==0 || nameValue.trim().length==0)
+    {
+        alert('Email id and name required');
+    }
+    else{
     var openFileForm = document.getElementById('openFileForm');
     var formData = new FormData(openFileForm);
     viewState.state = 'opening';
@@ -70,6 +77,7 @@ function openFile() {
             $('#imageFileName').html('Image : ' + viewState.fileName);
         }
     });
+}
 }
 
 function openFileForWaterMark()

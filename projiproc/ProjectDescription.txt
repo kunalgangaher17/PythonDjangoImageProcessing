@@ -1,0 +1,2 @@
+It is a web application, by the use of this user can perform image processing related operations like gray scale, rotating an image, flipping an image, adding watermark etc. User can undo there performed operations and can download
+the resultant images. Its server has been written in Django and opencv has been used for performing operations.
