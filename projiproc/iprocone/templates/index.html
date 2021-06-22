@@ -37,10 +37,12 @@
                 }
             });
         }
+        //this function will hide the color field of border modal
         function hideColorField() {
             document.getElementById("borderColor").style.visibility = 'hidden';
         }
 
+        //this function will show the color field of border modal
         function showColorField() {
             document.getElementById("borderColor").style.visibility = 'visible';
         }
@@ -71,6 +73,7 @@
   }) // forEach
 }); 
 
+//js function for undo the current operation of a user, it will invoke the "undo" service at server end using jquery/ajax
 function undo()
 {
     $('#spinnerWrap').css('display','');
@@ -89,6 +92,7 @@ function undo()
 });
 }
 
+//this function will hide/show the necessary fields for adding text watermark
 function textWatermark()
 {
     $('#watermarkColor').show();
@@ -97,6 +101,7 @@ function textWatermark()
     $('#watermarkImage').hide();
 }
 
+//this function will hide/show the necessary fields for adding image watermark
 function imageWatermark()
 {
     $('#watermarkColor').hide();
@@ -160,8 +165,11 @@ function imageWatermark()
 				</li>            
             </ul>
         </nav>
+        <!--Side bar content tab end here-->
+
         <!-- Page Content Holder -->
         <div id="content">
+            <!--Top bar of the page start-->
             <nav id='navigationBar' class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid">
                     <button type="button" id="sidebarCollapse" class="navbar-btn"
@@ -188,14 +196,15 @@ function imageWatermark()
                     </span>
                 </div>
             </nav>
-            <div id='topBar' class='topBar' style='visibility:hidden'>
+        <div id='topBar' class='topBar' style='visibility:hidden'>
                 <span class='imageFileName' id='imageFileName'></span>
                 <!--<a href="downloadFile">Download Files</a>-->
                 <span class='currentDate'>{{ today }}</span>
                 <a href='download_zipfile' style="background:green;margin-left:50px;margin-right:10px">Download</a>
                 <button type="button" class="btn" onclick="undo()" style="background:orange;margin-left:50px;margin-right:10px">Undo</button>
             </div>
-            <div id='clientArea'>
+                        <!--Top bar of the page end-->
+                        <div id='clientArea'>
                 <div id='openFileDivision'>
                     <h3>Open file and let the magic begin</h3>
                     <form id='openFileForm' enctype="multipart/form-data">

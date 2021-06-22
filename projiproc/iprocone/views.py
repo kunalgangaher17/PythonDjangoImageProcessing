@@ -36,7 +36,7 @@ def getImage(request):
         return FileResponse(open(fileToServe, 'rb'))
     return HttpResponse('')
 
-
+#api for opening an image file uploaded by user
 def openFile(request):
     if request.method == "POST":
         imageFile = request.FILES['fileName']
@@ -66,7 +66,7 @@ def openFile(request):
 def getState(request):
     return JsonResponse({'state': 'none', 'name': '', 'email': '', 'fileName': ''})
 
-
+#api for closing an image file uploaded by user
 def closeFile(request):
     if request.method == "GET" and request.has_key('stack'):
         stack = request.session['stack']
@@ -233,6 +233,7 @@ def controller(img, brightness=255, contrast=127):
     cv.putText(cal, ''.format(brightness, contrast), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     return cal
 
+
 def flipImageVertically(request):
     if request.method == 'GET' and request.session.has_key('stack'):
         stack = request.session['stack']
@@ -252,6 +253,7 @@ def flipImageVertically(request):
     else:
         return HttpResponse({'response':''})    
 
+
 def flipImageHorizontally(request):
     if request.method == 'GET' and request.session.has_key('stack'):
         stack = request.session['stack']
@@ -270,6 +272,7 @@ def flipImageHorizontally(request):
         return JsonResponse({'response': 'Flipped vertically'})
     else:
         return HttpResponse({'response':''})    
+
 
 def filterImage(request):
     if request.method=='POST' and request.session.has_key('stack'):
@@ -298,11 +301,13 @@ def filterImage(request):
     else:
         return HttpResponse({'response':''})    
 
+
 def downloadFile(request):
     fileResponse = open(
         'F:\PythonDjangoProject\django\projiproc\iprocone\hello.zip', 'rb')
     return fileResponse
     # return JsonResponse({'response':'Download file'})
+
 
 def download_zipfile(request):
   stack=request.session['stack']
@@ -318,7 +323,7 @@ def download_zipfile(request):
   response['Content-Disposition'] = 'attachment; filename=%s' %zip_name
 
   return response
-# Create your views here
+
 
 def undo(request):
     if request.method=="GET" and request.session.has_key('stack') and len(request.session['stack'])>1:
@@ -330,6 +335,7 @@ def undo(request):
         return JsonResponse({"response":"undid"})
     else:
         return HttpResponse('')
+
 
 def addWatermark(request):
     if request.method == 'POST' and request.session.has_key('stack'):
@@ -393,9 +399,7 @@ def addWatermark(request):
             logo = cv.imread(stdImagePath)
             h_logo, w_logo, _ = logo.shape
 
-#            img = cv2.imread("ImageForProject1.jpg")
             img = watermarkImage
-
             h_img, w_img, _ = img.shape
 
             center_y = int(h_img / 2)
@@ -412,8 +416,6 @@ def addWatermark(request):
                 # Replace the ROI on the image
             img[top_y: bottom_y, left_x: right_x] = result
             border=img
-
-
 
         cv.imwrite(watermarkFilePath, border)
         watermarkFileName = watermarkFilePath.split('/')[-1]

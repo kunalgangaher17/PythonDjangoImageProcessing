@@ -1,3 +1,4 @@
+//function for updating the view of the UI
 function updateView() {
     if (clientArea == null) clientArea = $('#clientArea');
     if (openFileDivision == null) openFileDivision = $('#openFileDivision');
@@ -28,7 +29,7 @@ function updateView() {
     }
 }
 
-
+//function for closing the file, which was previously opened by user
 function closeFile() {
     viewState.state = 'none';
     updateView();
@@ -42,6 +43,7 @@ function closeFile() {
     });
 }
 
+//function for opening the file selected by user
 function openFile() {
     var emailValue=$('#email').val();
     var nameValue=$('#name').val();
@@ -80,6 +82,7 @@ function openFile() {
 }
 }
 
+//function for opening an image which would be a watermark on a source image
 function openFileForWaterMark()
 {
     var openFileForm = document.getElementById('openFileForm');
@@ -102,12 +105,11 @@ function openFileForWaterMark()
 
 }
 
+//function for invocking a server api for adding watermark
 function addWatermark()
 {
     var watermarkForm = document.getElementById('addWatermark')
     var formData = new FormData(watermarkForm)
-    console.log("Text radio value :"+formData.get('textRadio'));
-    console.log("Custom radio value :"+formData.get('customRadio1'));
 
     $.ajax({
         url: "addWatermark",
@@ -121,6 +123,7 @@ function addWatermark()
         }
     });
 }
+//function for adding filters on an image
 function addFilter(filterType)
 {
     $('#spinnerWrap').css('display', '');
@@ -139,7 +142,7 @@ function addFilter(filterType)
     });
 }
 
-
+//function for flipping an image horizontally
 function flipHorizontal(flipURL)
 {
     $('#spinnerWrap').css('display', '');
@@ -157,6 +160,7 @@ function flipHorizontal(flipURL)
     });
 }
 
+//function for flipping an image vertically
 function flipVertical(flipURL)
 {
     $('#spinnerWrap').css('display', '');
@@ -174,6 +178,7 @@ function flipVertical(flipURL)
     });
 }
 
+//function for converting an image into gray scale
 function toGrayscale() {
     $('#spinnerWrap').css('display', '');
     $('#spinnerWrap').css('visibility', 'visible');
@@ -190,6 +195,7 @@ function toGrayscale() {
     });
 }
 
+//function for rotating an image
 function rotateImage() {
     var rotateForm = document.getElementById('rotateItForm');
     var rotateItFormData = new FormData(rotateForm);
@@ -207,6 +213,7 @@ function rotateImage() {
 
 }
 
+//function for scaling an image
 function scaleIt() {
     var scaleForm = document.getElementById('scaleItForm');
     var scaleItFormData = new FormData(scaleForm);
@@ -223,6 +230,7 @@ function scaleIt() {
     });
 }
 
+//function for setting the border
 function setborder() {
     var borderForm = document.getElementById('setborder')
     var formData = new FormData(borderForm)
@@ -240,6 +248,7 @@ function setborder() {
     });
 }
 
+//function for enhancing an image
 function enhanceImage() {
     var enhanceImageForm=document.getElementById('enhanceImage');
     var formData=new FormData(enhanceImageForm)
